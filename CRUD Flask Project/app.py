@@ -9,7 +9,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 app.config["SQLALCHEMY_TRACK_MODIFCATION"] = False
 db = SQLAlchemy(app)
 
-#Data Class ~ Row of data
+#Row of data
 class MyTask(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String(100), nullable=False)
@@ -23,11 +23,10 @@ with app.app_context():
     db.create_all()
     
 
-#Routes to Web pages
-#Home page
+#Routes
 @app.route("/", methods=["POST", "GET"])
 def index():
-    #Add a task
+    #Add task
     if request.method == "POST":
         current_task = request.form['content']
         new_task = MyTask(content=current_task)
@@ -36,15 +35,15 @@ def index():
             db.session.commit()
             return redirect("/")
         except Exception as e:
-            print(f"ERROR:{e}")
-            return f"ERROR:{e}"
-     #See all current task
+            print(f"Error:{e}")
+            return f"Error:{e}"
+     #display current task
     else:
         tasks = MyTask.query.order_by(MyTask.created).all()
         return render_template('index.html', tasks=tasks)
 
 
-#Delete an item
+#Delete item
 @app.route("/delete/<int:id>")
 def delete(id:int):
     delete_task = MyTask.query.get_or_404(id)
@@ -56,7 +55,7 @@ def delete(id:int):
         return f"ERROR:{e}"
 
 
-#Edit an item
+#Edit item
 @app.route("/edit/<int:id>", methods=["GET", "POST"])
 def edit(id:int):
     task = MyTask.query.get_or_404(id)
@@ -66,7 +65,7 @@ def edit(id:int):
            db.session.commit()
            return redirect("/")
         except Exception as e:
-            return f"ERROR:{e}"
+            return f"Error:{e}"
     else:
         return render_template('edit.html', task=task)
 
